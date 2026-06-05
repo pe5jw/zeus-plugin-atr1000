@@ -16,12 +16,31 @@ jobs:
       - name: Checkout plugin repo
         uses: actions/checkout@v4
 
-      - name: Checkout openhpsdr-zeus (for Zeus.Plugins.Contracts)
+      - name: Checkout openhpsdr-zeus (contracts only, sparse)
         uses: actions/checkout@v4
         with:
           repository: Kb2uka/openhpsdr-zeus
-          ref: develop
+          ref: main
           path: openhpsdr-zeus
+          sparse-checkout: |
+            Zeus.Plugins.Contracts
+            Zeus.Contracts
+          sparse-checkout-cone-mode: false
+
+      - name: Find Zeus.Plugins.Contracts csproj
+        id: contracts
+        run: |
+          CSPROJ=$(find openhpsdr-zeus -name "*.csproj" | grep -i "plugin" | head -1)
+          if [ -z "$CSPROJ" ]; then
+            CSPROJ=$(find openhpsdr-zeus -name "*.csproj" | grep -i "contract" | head -1)
+          fi
+          if [ -z "$CSPROJ" ]; then
+            echo "Available csproj files:"
+            find openhpsdr-zeus -name "*.csproj"
+            exit 1
+          fi
+          echo "Found: $CSPROJ"
+          echo "path=$CSPROJ" >> $GITHUB_OUTPUT
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
@@ -41,18 +60,18 @@ jobs:
         run: npm run build
 
       - name: Build plugin
-        run: >
-          dotnet build Atr1000.csproj
-          -c Release
-          /p:ZeusContractsProject=openhpsdr-zeus/Zeus.Plugins.Contracts/Zeus.Plugins.Contracts.csproj
+        run: |
+          dotnet build Atr1000.csproj \
+            -c Release \
+            /p:ZeusContractsProject=${{ steps.contracts.outputs.path }}
 
       - name: Publish plugin
-        run: >
-          dotnet publish Atr1000.csproj
-          -c Release
-          --no-build
-          -o dist
-          /p:ZeusContractsProject=openhpsdr-zeus/Zeus.Plugins.Contracts/Zeus.Plugins.Contracts.csproj
+        run: |
+          dotnet publish Atr1000.csproj \
+            -c Release \
+            --no-build \
+            -o dist \
+            /p:ZeusContractsProject=${{ steps.contracts.outputs.path }}
 
       - name: Get version
         id: version
