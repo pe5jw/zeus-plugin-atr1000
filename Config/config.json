@@ -1,0 +1,17 @@
+{
+    "server": {
+        "http_port": 80,
+        "websocket_port": 60001,
+        "auto_open_browser": true
+    },
+    "logging": {
+        "console_io_log_enabled": true
+    },
+    "wizard": {
+        "completed": false,
+        "step": 1,
+        "language": "en",
+        "theme": "light",
+        "fontSize": "normal"
+    }
+}

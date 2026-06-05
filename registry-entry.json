@@ -1,0 +1,20 @@
+{
+  "id": "com.antuner.zeus.plugins.atr1000",
+  "name": "Antuner ATR-1000",
+  "description": "Antuner ATR-1000 1 kW HF automatic antenna tuner — WiFi/WebSocket control: live power & SWR, L/C relay state, per-band memory recall, remote tuning, and optional auto-tune on band change.",
+  "author": "PE5JW <pe5jw@example.com>",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://github.com/pe5jw/zeus-plugin-atr1000",
+  "categories": ["tuner"],
+  "verified": false,
+  "versions": [
+    {
+      "version": "0.2.0",
+      "sdkAbi": 1,
+      "sdkMinVersion": "1.0.0",
+      "platforms": ["any"],
+      "downloadUrl": "https://github.com/pe5jw/zeus-plugin-atr1000/releases/download/v0.2.0/atr1000-0.2.0.zip",
+      "sha256": "REPLACE_WITH_OUTPUT_OF_BUILD_SCRIPT"
+    }
+  ]
+}

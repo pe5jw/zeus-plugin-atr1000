@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Atr1000</AssemblyName>
+    <RootNamespace>Openhpsdr.Zeus.Plugins.Atr1000</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+
+    <!--
+      Zeus.Plugins.Contracts reference — two modes, chosen automatically:
+
+      LOCAL (default)
+        Uses the DLL from your installed Zeus application.
+        No source checkout needed; just build.
+        Default path: C:\Users\joeri\AppData\Local\Programs\OpenHPSDR-Zeus
+        Override:  /p:ZeusInstallDir=D:\your\custom\install\path
+
+      CI / source build
+        When ZeusContractsProject is set (e.g. by the GitHub Actions workflow
+        after checking out openhpsdr-zeus), a ProjectReference is used instead.
+        Override:  /p:ZeusContractsProject=..\openhpsdr-zeus\Zeus.Plugins.Contracts\Zeus.Plugins.Contracts.csproj
+    -->
+    <ZeusInstallDir Condition="'$(ZeusInstallDir)'==''">C:\Users\joeri\AppData\Local\Programs\OpenHPSDR-Zeus</ZeusInstallDir>
+    <ZeusContractsProject Condition="'$(ZeusContractsProject)'=='' and '$(ZEUS_CONTRACTS_PROJECT)'!=''">
+      $(ZEUS_CONTRACTS_PROJECT)
+    </ZeusContractsProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <!-- Use the installed DLL unless a source .csproj was explicitly provided. -->
+  <ItemGroup Condition="'$(ZeusContractsProject)'==''">
+    <Reference Include="Zeus.Plugins.Contracts">
+      <HintPath>$(ZeusInstallDir)\Zeus.Plugins.Contracts.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ZeusContractsProject)'!=''">
+    <ProjectReference Include="$(ZeusContractsProject)">
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="ui\**\*.js" CopyToOutputDirectory="PreserveNewest" Condition="Exists('ui')" />
+  </ItemGroup>
+
+</Project>

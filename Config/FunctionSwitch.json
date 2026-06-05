@@ -1,0 +1,8 @@
+{
+    "home_radio": {
+        "freq_follow_enabled": true,
+        "tune_follow_enabled": false,
+        "tune_ctrl_enabled": 0,
+        "auto_sync_enabled": true
+    }
+}
