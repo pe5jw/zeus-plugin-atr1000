@@ -17,3 +17,9 @@ atr1000-*.zip
 
 # Windows
 Thumbs.db
+
+ATR_Control.exe
+Config/
+atr_probe_out/
+*.zip
+build.yml
