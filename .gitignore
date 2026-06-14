@@ -1,0 +1,19 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Node / Vite
+node_modules/
+dist/
+
+# Build artefacts
+atr1000-*.zip
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
