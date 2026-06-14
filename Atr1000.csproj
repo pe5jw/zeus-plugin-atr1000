@@ -29,6 +29,14 @@
     </ZeusContractsProject>
   </PropertyGroup>
 
+  <!-- Exclude the openhpsdr-zeus submodule from the default recursive compile glob.
+       The SDK's Microsoft.NET.Sdk picks up ALL *.cs files under the project root,
+       which would pull in Zeus's own source (tests, tools, server) when the submodule
+       is checked out next to this file. -->
+  <ItemGroup>
+    <Compile Remove="openhpsdr-zeus\**\*.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
