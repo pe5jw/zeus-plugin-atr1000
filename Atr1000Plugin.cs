@@ -46,6 +46,10 @@ public sealed class Atr1000Plugin : IZeusPlugin, IBackendPlugin
     // Radio controller (ControlRadio capability) — used to key TX for Full/Fine tune.
     private IRadioController? _radioController;
 
+    // HttpClient for calling Zeus internal endpoints (e.g. /api/tx/tun).
+    private static readonly HttpClient _http = new();
+    private string _zeusBaseUrl = "http://localhost:6060";
+
     // Auto-tune-on-band-change state.
     private bool _autoTune;
     private Action<long>? _freqHandler;
@@ -234,17 +238,19 @@ public sealed class Atr1000Plugin : IZeusPlugin, IBackendPlugin
         return Results.Ok(c.GetStatus() with { AutoTune = _autoTune });
     }
 
-    // Key TX, wait for tuning to complete (tuneMode → 0), then unkey.
+    // Key Zeus's built-in TUN carrier via POST /api/tx/tun.
+    // This uses TxTuneDriver (clean single-tone, full tune-drive power, no mic)
+    // which is exactly what the Zeus Tune button does internally.
     // Safety timeout: 30 seconds maximum carrier.
     private async Task KeyCarrierForTuneAsync(IRadioController rc,
         Atr1000Connection conn, CancellationToken ct)
     {
         try
         {
-            await rc.SetMoxAsync(true, ct);
-            _ctx?.Logger.LogInformation("ATR-1000: carrier ON for tune");
+            await SetZeusTunAsync(true, ct);
+            _ctx?.Logger.LogInformation("ATR-1000: TUN carrier ON for tune");
 
-            // Poll until the device reports tuneMode=0 (done) or timeout.
+            // Poll until the device reports isTuning=false (done) or timeout.
             var deadline = DateTime.UtcNow.AddSeconds(30);
             while (DateTime.UtcNow < deadline && !ct.IsCancellationRequested)
             {
@@ -254,14 +260,26 @@ public sealed class Atr1000Plugin : IZeusPlugin, IBackendPlugin
         }
         catch (Exception ex)
         {
-            _ctx?.Logger.LogWarning(ex, "ATR-1000: carrier key error");
+            _ctx?.Logger.LogWarning(ex, "ATR-1000: TUN carrier error");
         }
         finally
         {
-            try { await rc.SetMoxAsync(false, CancellationToken.None); }
+            try { await SetZeusTunAsync(false, CancellationToken.None); }
             catch { /* ignore */ }
-            _ctx?.Logger.LogInformation("ATR-1000: carrier OFF after tune");
+            _ctx?.Logger.LogInformation("ATR-1000: TUN carrier OFF after tune");
         }
+    }
+
+    private async Task SetZeusTunAsync(bool on, CancellationToken ct)
+    {
+        var url = $"{_zeusBaseUrl}/api/tx/tun";
+        var body = new StringContent(
+            System.Text.Json.JsonSerializer.Serialize(new { on }),
+            System.Text.Encoding.UTF8,
+            "application/json");
+        var resp = await _http.PostAsync(url, body, ct);
+        resp.EnsureSuccessStatusCode();
+        _ctx?.Logger.LogDebug("ATR-1000: POST /api/tx/tun on={On} -> {Status}", on, resp.StatusCode);
     }
 
     private async Task<IResult> SetBypass(BypassRequest req)
