@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: OpenHPSDR-Zeus-org/openhpsdr-zeus
-          ref: v0.10.0
+          ref: v0.10.8
           path: openhpsdr-zeus
 
       - name: Set up .NET 10

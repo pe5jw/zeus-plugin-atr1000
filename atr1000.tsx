@@ -5,6 +5,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+// SWR colour helper — matches TGXL plugin convention
+function swrClass(swr: number, hasPower: boolean): string {
+  if (!hasPower || swr <= 0 || swr >= 99) return 'dim';
+  if (swr <= 1.5) return 'swr-good';
+  if (swr <= 2.5) return 'swr-warn';
+  return 'swr-bad';
+}
+
+
+
 interface ZeusPluginApi {
     registerPanel(spec: { id: string; component: React.ComponentType }): void;
     callBackend(method: string, path: string, body?: unknown): Promise<Response>;
@@ -104,6 +114,18 @@ const css = `
 .atr-rig{font-family:ui-monospace,monospace;font-size:10px;color:#6c7484;margin-top:6px}
 .atr-rig .hi{color:#c8cfdb}
 .atr-rig .tx{color:#e63a2b;font-weight:700}
+
+/* SWR colour coding — TGXL convention */
+.atr-mv.swr-good { color: #5cd479; }
+.atr-mv.swr-warn { color: #ffc93a; }
+.atr-mv.swr-bad  { color: #e63a2b; }
+
+/* L/C progress bars — TGXL style */
+.lc-bar-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.lc-bar-lbl { font-family: ui-monospace, monospace; font-size: 9px; color: #8a93a3; width: 12px; text-align: right; }
+.lc-bar     { flex: 1; height: 4px; background: #1a1f27; border-radius: 2px; overflow: hidden; }
+.lc-bar-fill{ height: 100%; background: rgba(74,158,255,0.7); border-radius: 2px; transition: width 200ms ease; }
+.lc-bar-val { font-family: ui-monospace, monospace; font-size: 9px; color: #8a93a3; width: 36px; text-align: right; }
 `;
 
 function swrClass(swr: number, live: boolean) {
@@ -446,10 +468,15 @@ function FullPanel({ api }: { api: ZeusPluginApi }) {
                     <div className="lc-box">
                         <button type="button" className="btn step"
                             onClick={() => post('/lc', { deltaL:-1, deltaC:0 })}>&#8722;</button>
-                        <div style={{ textAlign:'center' }}>
+                        <div style={{ textAlign:'center', flex:1 }}>
                             <div className="lc-name">Inductance</div>
                             <div className="lc-val">{(s?.inductanceUh ?? 0).toFixed(2)} &micro;H</div>
                             <div className="lc-code">relay {s?.indCode ?? 0}</div>
+                            <div className="lc-bar-row">
+                                <div className="lc-bar">
+                                    <div className="lc-bar-fill" style={{ width:`${Math.min(100, ((s?.indCode ?? 0) / 15) * 100)}%` }} />
+                                </div>
+                            </div>
                         </div>
                         <button type="button" className="btn step"
                             onClick={() => post('/lc', { deltaL:1, deltaC:0 })}>+</button>
@@ -457,10 +484,15 @@ function FullPanel({ api }: { api: ZeusPluginApi }) {
                     <div className="lc-box">
                         <button type="button" className="btn step"
                             onClick={() => post('/lc', { deltaL:0, deltaC:-1 })}>&#8722;</button>
-                        <div style={{ textAlign:'center' }}>
+                        <div style={{ textAlign:'center', flex:1 }}>
                             <div className="lc-name">Capacitance</div>
                             <div className="lc-val">{s?.capacitancePf ?? 0} pF</div>
                             <div className="lc-code">relay {s?.capCode ?? 0}</div>
+                            <div className="lc-bar-row">
+                                <div className="lc-bar">
+                                    <div className="lc-bar-fill" style={{ width:`${Math.min(100, ((s?.capCode ?? 0) / 15) * 100)}%` }} />
+                                </div>
+                            </div>
                         </div>
                         <button type="button" className="btn step"
                             onClick={() => post('/lc', { deltaL:0, deltaC:1 })}>+</button>
