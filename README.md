@@ -40,7 +40,7 @@ on port 60001 — decoded directly from the device's own web app.
 
 ```text
 projects/
-  openhpsdr-zeus/        ← git clone https://github.com/Kb2uka/openhpsdr-zeus -b develop
+  openhpsdr-zeus/        ← git clone https://github.com/OpenHPSDR-Zeus-org/openhpsdr-zeus -b develop
   zeus-plugin-atr1000/   ← git clone https://github.com/pe5jw/zeus-plugin-atr1000
 ```
 
@@ -119,7 +119,7 @@ python tools/atr_probe.py 192.168.2.124 --seconds 25
 
 1. Create a GitHub release tagged `v<version>` (CI attaches the zip automatically).
 2. Copy the SHA-256 printed by the build script into `registry-entry.json`.
-3. Fork [Kb2uka/openhpsdr-zeus-plugins](https://github.com/Kb2uka/openhpsdr-zeus-plugins),
+3. Fork [openhpsdr-zeus-plugins](https://github.com/openhpsdr-org/openhpsdr-zeus-plugins),
    add your `registry-entry.json` block to `registry.json`, and open a PR.
 
 ---
