@@ -27,7 +27,7 @@ on port 60001 — decoded directly from the device's own web app.
 
 ## Requirements
 
-- **Openhpsdr-Zeus** — [develop branch](https://github.com/Kb2uka/openhpsdr-zeus/tree/develop)
+- **Openhpsdr-Zeus** — [Latest release](https://github.com/OpenHPSDR-Zeus-org/openhpsdr-zeus)
 - **.NET 10 SDK** — [download](https://dotnet.microsoft.com/download)
 - **Node.js 22 + npm** — [download](https://nodejs.org/)
 - ATR-1000 with WiFi enabled and reachable on the same network
